@@ -3,8 +3,192 @@ let isSorting = false;
 let shouldStop = false;
 let startTime = 0;
 let timerInterval = null;
-let comparisons = 0;
-let swaps = 0;
+
+// Sorting Algorithms Class
+class SortingAlgorithm {
+  constructor() {
+    this.comparisons = 0;
+    this.swaps = 0;
+    this.steps = [];
+  }
+
+  reset() {
+    this.comparisons = 0;
+    this.swaps = 0;
+    this.steps = [];
+  }
+
+  addStep(arr) {
+    this.steps.push([...arr]);
+  }
+
+  bubbleSort(arr) {
+    this.reset();
+    const n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+      for (let j = 0; j < n - i - 1; j++) {
+        this.comparisons++;
+        if (arr[j] > arr[j + 1]) {
+          [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+          this.swaps++;
+        }
+        this.addStep(arr);
+      }
+    }
+    return this.steps;
+  }
+
+  selectionSort(arr) {
+    this.reset();
+    const n = arr.length;
+    for (let i = 0; i < n - 1; i++) {
+      let minIdx = i;
+      for (let j = i + 1; j < n; j++) {
+        this.comparisons++;
+        if (arr[j] < arr[minIdx]) {
+          minIdx = j;
+        }
+        this.addStep(arr);
+      }
+      [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+      this.swaps++;
+      this.addStep(arr);
+    }
+    return this.steps;
+  }
+
+  insertionSort(arr) {
+    this.reset();
+    for (let i = 1; i < arr.length; i++) {
+      let key = arr[i];
+      let j = i - 1;
+      while (j >= 0 && arr[j] > key) {
+        this.comparisons++;
+        arr[j + 1] = arr[j];
+        j--;
+        this.addStep(arr);
+      }
+      arr[j + 1] = key;
+      this.swaps++;
+      this.addStep(arr);
+    }
+    return this.steps;
+  }
+
+  mergeSort(arr) {
+    this.reset();
+    this._mergeSortHelper(arr, 0, arr.length - 1);
+    return this.steps;
+  }
+
+  _mergeSortHelper(arr, left, right) {
+    if (left < right) {
+      const mid = Math.floor((left + right) / 2);
+      this._mergeSortHelper(arr, left, mid);
+      this._mergeSortHelper(arr, mid + 1, right);
+      this._merge(arr, left, mid, right);
+    }
+  }
+
+  _merge(arr, left, mid, right) {
+    const leftArr = arr.slice(left, mid + 1);
+    const rightArr = arr.slice(mid + 1, right + 1);
+    let i = 0,
+      j = 0,
+      k = left;
+
+    while (i < leftArr.length && j < rightArr.length) {
+      this.comparisons++;
+      if (leftArr[i] <= rightArr[j]) {
+        arr[k++] = leftArr[i++];
+      } else {
+        arr[k++] = rightArr[j++];
+      }
+      this.swaps++;
+      this.addStep(arr);
+    }
+
+    while (i < leftArr.length) {
+      arr[k++] = leftArr[i++];
+      this.addStep(arr);
+    }
+
+    while (j < rightArr.length) {
+      arr[k++] = rightArr[j++];
+      this.addStep(arr);
+    }
+  }
+
+  quickSort(arr) {
+    this.reset();
+    this._quickSortHelper(arr, 0, arr.length - 1);
+    return this.steps;
+  }
+
+  _quickSortHelper(arr, low, high) {
+    if (low < high) {
+      const pi = this._partition(arr, low, high);
+      this._quickSortHelper(arr, low, pi - 1);
+      this._quickSortHelper(arr, pi + 1, high);
+    }
+  }
+
+  _partition(arr, low, high) {
+    const pivot = arr[high];
+    let i = low - 1;
+    for (let j = low; j < high; j++) {
+      this.comparisons++;
+      if (arr[j] < pivot) {
+        i++;
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+        this.swaps++;
+        this.addStep(arr);
+      }
+    }
+    [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+    this.swaps++;
+    this.addStep(arr);
+    return i + 1;
+  }
+
+  heapSort(arr) {
+    this.reset();
+    const n = arr.length;
+    for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+      this._heapify(arr, n, i);
+    }
+    for (let i = n - 1; i > 0; i--) {
+      [arr[0], arr[i]] = [arr[i], arr[0]];
+      this.swaps++;
+      this.addStep(arr);
+      this._heapify(arr, i, 0);
+    }
+    return this.steps;
+  }
+
+  _heapify(arr, n, i) {
+    let largest = i;
+    const left = 2 * i + 1;
+    const right = 2 * i + 2;
+
+    if (left < n && arr[left] > arr[largest]) {
+      this.comparisons++;
+      largest = left;
+    }
+    if (right < n && arr[right] > arr[largest]) {
+      this.comparisons++;
+      largest = right;
+    }
+    if (largest !== i) {
+      [arr[i], arr[largest]] = [arr[largest], arr[i]];
+      this.swaps++;
+      this.addStep(arr);
+      this._heapify(arr, n, largest);
+    }
+  }
+}
+
+const sorter = new SortingAlgorithm();
 
 function generateArray() {
   const userInput = document.getElementById("userInput").value.trim();
@@ -68,36 +252,38 @@ async function startSorting() {
   startTimer();
   resetStats();
 
-  try {
-    const response = await fetch("/api/sort", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        array: [...array],
-        algorithm: algorithm,
-      }),
-    });
+  let steps = [];
+  switch (algorithm) {
+    case "bubble":
+      steps = sorter.bubbleSort([...array]);
+      break;
+    case "selection":
+      steps = sorter.selectionSort([...array]);
+      break;
+    case "insertion":
+      steps = sorter.insertionSort([...array]);
+      break;
+    case "merge":
+      steps = sorter.mergeSort([...array]);
+      break;
+    case "quick":
+      steps = sorter.quickSort([...array]);
+      break;
+    case "heap":
+      steps = sorter.heapSort([...array]);
+      break;
+  }
 
-    if (!response.ok) throw new Error("Sort failed");
-    const data = await response.json();
+  await visualizeSteps(steps, delay);
 
-    comparisons = data.comparisons;
-    swaps = data.swaps;
-    const steps = data.steps;
-
-    await visualizeSteps(steps, delay);
-
-    if (!shouldStop) {
-      array = steps[steps.length - 1];
-      displayArray(
-        array,
-        [],
-        array.map((_, i) => i)
-      );
-      audioManager.playComplete();
-    }
-  } catch (error) {
-    alert("Error: " + error.message);
+  if (!shouldStop) {
+    array = steps[steps.length - 1];
+    displayArray(
+      array,
+      [],
+      array.map((_, i) => i)
+    );
+    audioManager.playComplete();
   }
 
   isSorting = false;
@@ -122,7 +308,8 @@ async function visualizeSteps(steps, delay) {
       audioManager.playComparison(avgValue, max);
     }
 
-    updateStats();
+    document.getElementById("comparisons").textContent = sorter.comparisons;
+    document.getElementById("swaps").textContent = sorter.swaps;
     await new Promise((r) => setTimeout(r, delay));
   }
 }
@@ -159,16 +346,9 @@ function disableControls(disabled) {
 }
 
 function resetStats() {
-  comparisons = 0;
-  swaps = 0;
   document.getElementById("comparisons").textContent = "0";
   document.getElementById("swaps").textContent = "0";
   document.getElementById("timer").textContent = "0.00s";
-}
-
-function updateStats() {
-  document.getElementById("comparisons").textContent = comparisons;
-  document.getElementById("swaps").textContent = swaps;
 }
 
 function startTimer() {
@@ -178,7 +358,6 @@ function startTimer() {
     const minutes = Math.floor(elapsed / 60);
     const seconds = (elapsed % 60).toFixed(2);
 
-    // Show format: MM:SS.ms or just SS.ms if under 1 minute
     if (minutes > 0) {
       document.getElementById("timer").textContent = `${minutes}m ${seconds}s`;
     } else {
@@ -191,7 +370,6 @@ function stopTimer() {
   if (timerInterval) clearInterval(timerInterval);
 }
 
-// Speed label indicator
 document.getElementById("speed").addEventListener("input", (e) => {
   const speed = parseInt(e.target.value);
   let label = "Normal";
