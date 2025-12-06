@@ -385,5 +385,3 @@ document.getElementById("speed").addEventListener("input", (e) => {
 document.getElementById("soundToggle").addEventListener("change", (e) => {
   audioManager.setEnabled(e.target.checked);
 });
-
-window.addEventListener("load", generateArray);
