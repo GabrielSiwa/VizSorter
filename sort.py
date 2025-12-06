@@ -6,144 +6,190 @@ app = Flask(__name__, static_folder='static')
 def index():
     return send_file('index.html')
 
-# ---------------- SORTING ALGORITHMS ----------------
-def bubble_sort(arr):
-    steps = []
-    n = len(arr)
-    for i in range(n):
-        for j in range(0, n - i - 1):
-            if arr[j] > arr[j + 1]:
-                arr[j], arr[j + 1] = arr[j + 1], arr[j]
-            steps.append(arr.copy())
-    return steps
+# Sorting Algorithms
+class SortingAlgorithm:
+    def __init__(self):
+        self.comparisons = 0
+        self.swaps = 0
+        self.steps = []
 
+    def reset(self):
+        self.comparisons = 0
+        self.swaps = 0
+        self.steps = []
 
-def selection_sort(arr):
-    steps = []
-    n = len(arr)
-    for i in range(n):
-        min_idx = i
-        for j in range(i + 1, n):
-            if arr[j] < arr[min_idx]:
-                min_idx = j
-        arr[i], arr[min_idx] = arr[min_idx], arr[i]
-        steps.append(arr.copy())
-    return steps
+    def add_step(self, arr):
+        self.steps.append(arr.copy())
 
+    def bubble_sort(self, arr):
+        self.reset()
+        n = len(arr)
+        for i in range(n):
+            for j in range(0, n - i - 1):
+                self.comparisons += 1
+                if arr[j] > arr[j + 1]:
+                    arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                    self.swaps += 1
+                self.add_step(arr)
+        return self.steps
 
-def insertion_sort(arr):
-    steps = []
-    for i in range(1, len(arr)):
-        key = arr[i]
-        j = i - 1
-        while j >= 0 and key < arr[j]:
-            arr[j + 1] = arr[j]
-            j -= 1
-            steps.append(arr.copy())
-        arr[j + 1] = key
-        steps.append(arr.copy())
-    return steps
+    def selection_sort(self, arr):
+        self.reset()
+        n = len(arr)
+        for i in range(n):
+            min_idx = i
+            for j in range(i + 1, n):
+                self.comparisons += 1
+                if arr[j] < arr[min_idx]:
+                    min_idx = j
+                self.add_step(arr)
+            arr[i], arr[min_idx] = arr[min_idx], arr[i]
+            self.swaps += 1
+            self.add_step(arr)
+        return self.steps
 
+    def insertion_sort(self, arr):
+        self.reset()
+        for i in range(1, len(arr)):
+            key = arr[i]
+            j = i - 1
+            while j >= 0 and arr[j] > key:
+                self.comparisons += 1
+                arr[j + 1] = arr[j]
+                j -= 1
+                self.add_step(arr)
+            arr[j + 1] = key
+            self.swaps += 1
+            self.add_step(arr)
+        return self.steps
 
-def merge_sort_steps(arr):
-    steps = []
-    def merge_sort(a, start, end):
-        if end - start > 1:
-            mid = (start + end)//2
-            merge_sort(a, start, mid)
-            merge_sort(a, mid, end)
-            L, R = a[start:mid], a[mid:end]
-            i = j = 0
-            k = start
-            while i < len(L) and j < len(R):
-                if L[i] < R[j]:
-                    a[k] = L[i]
-                    i += 1
-                else:
-                    a[k] = R[j]
-                    j += 1
-                k += 1
-                steps.append(a.copy())
-            while i < len(L):
-                a[k] = L[i]
+    def merge_sort(self, arr):
+        self.reset()
+        self._merge_sort_helper(arr, 0, len(arr) - 1)
+        return self.steps
+
+    def _merge_sort_helper(self, arr, left, right):
+        if left < right:
+            mid = (left + right) // 2
+            self._merge_sort_helper(arr, left, mid)
+            self._merge_sort_helper(arr, mid + 1, right)
+            self._merge(arr, left, mid, right)
+
+    def _merge(self, arr, left, mid, right):
+        left_arr = arr[left:mid + 1]
+        right_arr = arr[mid + 1:right + 1]
+        i = j = 0
+        k = left
+        while i < len(left_arr) and j < len(right_arr):
+            self.comparisons += 1
+            if left_arr[i] <= right_arr[j]:
+                arr[k] = left_arr[i]
                 i += 1
-                k += 1
-                steps.append(a.copy())
-            while j < len(R):
-                a[k] = R[j]
+            else:
+                arr[k] = right_arr[j]
                 j += 1
-                k += 1
-                steps.append(a.copy())
-    merge_sort(arr, 0, len(arr))
-    return steps
+            self.swaps += 1
+            self.add_step(arr)
+            k += 1
+        while i < len(left_arr):
+            arr[k] = left_arr[i]
+            i += 1
+            k += 1
+            self.add_step(arr)
+        while j < len(right_arr):
+            arr[k] = right_arr[j]
+            j += 1
+            k += 1
+            self.add_step(arr)
 
+    def quick_sort(self, arr):
+        self.reset()
+        self._quick_sort_helper(arr, 0, len(arr) - 1)
+        return self.steps
 
-def quick_sort_steps(arr):
-    steps = []
-    def quick_sort(a, low, high):
+    def _quick_sort_helper(self, arr, low, high):
         if low < high:
-            p = partition(a, low, high)
-            quick_sort(a, low, p - 1)
-            quick_sort(a, p + 1, high)
-    def partition(a, low, high):
-        pivot = a[high]
+            pi = self._partition(arr, low, high)
+            self._quick_sort_helper(arr, low, pi - 1)
+            self._quick_sort_helper(arr, pi + 1, high)
+
+    def _partition(self, arr, low, high):
+        pivot = arr[high]
         i = low - 1
         for j in range(low, high):
-            if a[j] <= pivot:
+            self.comparisons += 1
+            if arr[j] < pivot:
                 i += 1
-                a[i], a[j] = a[j], a[i]
-                steps.append(a.copy())
-        a[i + 1], a[high] = a[high], a[i + 1]
-        steps.append(a.copy())
+                arr[i], arr[j] = arr[j], arr[i]
+                self.swaps += 1
+                self.add_step(arr)
+        arr[i + 1], arr[high] = arr[high], arr[i + 1]
+        self.swaps += 1
+        self.add_step(arr)
         return i + 1
-    quick_sort(arr, 0, len(arr) - 1)
-    return steps
 
+    def heap_sort(self, arr):
+        self.reset()
+        n = len(arr)
+        for i in range(n // 2 - 1, -1, -1):
+            self._heapify(arr, n, i)
+        for i in range(n - 1, 0, -1):
+            arr[0], arr[i] = arr[i], arr[0]
+            self.swaps += 1
+            self.add_step(arr)
+            self._heapify(arr, i, 0)
+        return self.steps
 
-def heap_sort_steps(arr):
-    steps = []
-    def heapify(n, i):
+    def _heapify(self, arr, n, i):
         largest = i
-        l = 2 * i + 1
-        r = 2 * i + 2
-        if l < n and arr[l] > arr[largest]:
-            largest = l
-        if r < n and arr[r] > arr[largest]:
-            largest = r
+        left = 2 * i + 1
+        right = 2 * i + 2
+        if left < n and arr[left] > arr[largest]:
+            self.comparisons += 1
+            largest = left
+        if right < n and arr[right] > arr[largest]:
+            self.comparisons += 1
+            largest = right
         if largest != i:
             arr[i], arr[largest] = arr[largest], arr[i]
-            steps.append(arr.copy())
-            heapify(n, largest)
-    n = len(arr)
-    for i in range(n // 2 - 1, -1, -1):
-        heapify(n, i)
-    for i in range(n - 1, 0, -1):
-        arr[i], arr[0] = arr[0], arr[i]
-        steps.append(arr.copy())
-        heapify(i, 0)
-    return steps
+            self.swaps += 1
+            self.add_step(arr)
+            self._heapify(arr, n, largest)
 
-@app.route('/sort', methods=['POST'])
+sorter = SortingAlgorithm()
+
+@app.route('/api/sort', methods=['POST'])
 def sort_data():
     data = request.json
-    arr = data.get("array", [])
-    algo = data.get("algorithm", "bubble")
+    array = data.get('array', [])
+    algorithm = data.get('algorithm', 'bubble')
 
-    algorithms = {
-        "bubble": bubble_sort,
-        "selection": selection_sort,
-        "insertion": insertion_sort,
-        "merge": merge_sort_steps,
-        "quick": quick_sort_steps,
-        "heap": heap_sort_steps
-    }
+    if not array:
+        return jsonify({'error': 'No array provided'}), 400
 
-    if algo not in algorithms:
-        return jsonify({"error": "Invalid algorithm"}), 400
+    try:
+        if algorithm == 'bubble':
+            steps = sorter.bubble_sort(array)
+        elif algorithm == 'selection':
+            steps = sorter.selection_sort(array)
+        elif algorithm == 'insertion':
+            steps = sorter.insertion_sort(array)
+        elif algorithm == 'merge':
+            steps = sorter.merge_sort(array)
+        elif algorithm == 'quick':
+            steps = sorter.quick_sort(array)
+        elif algorithm == 'heap':
+            steps = sorter.heap_sort(array)
+        else:
+            return jsonify({'error': 'Unknown algorithm'}), 400
 
-    steps = algorithms[algo](arr.copy())
-    return jsonify({"steps": steps})
-
+        return jsonify({
+            'steps': steps,
+            'comparisons': sorter.comparisons,
+            'swaps': sorter.swaps
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
