@@ -370,10 +370,13 @@ async function visualizeSteps(steps, delay) {
 }
 
 function updateStepInfo(current, total, description) {
-  const progress = Math.round((current / total) * 100);
+  const progress = total > 0 ? Math.round(((current + 1) / total) * 100) : 0;
   const algoDescElement = document.getElementById("algoDescription");
 
-  algoDescElement.textContent = `${description} [${progress}% complete]`;
+  algoDescElement.textContent = `${description} [${Math.min(
+    progress,
+    100
+  )}% complete]`;
 }
 
 function stopSorting() {
