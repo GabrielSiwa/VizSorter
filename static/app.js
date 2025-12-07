@@ -225,6 +225,7 @@ function displayArray(arr, comparing = [], sorted = []) {
       bar.classList.add("sorted");
     } else if (comparing.includes(idx)) {
       bar.classList.add("comparing");
+      bar.style.boxShadow = "0 0 15px rgba(255, 215, 0, 0.8)";
     }
 
     bar.style.height = `${(num / max) * 350}px`;
@@ -300,7 +301,11 @@ async function visualizeSteps(steps, delay) {
     if (shouldStop) break;
 
     const step = steps[i];
-    displayArray(step);
+
+    // Track which indices are being compared in this step
+    const comparing = i > 0 ? getComparingIndices(steps[i - 1], step) : [];
+
+    displayArray(step, comparing);
 
     if (soundEnabled) {
       const max = Math.max(...step);
@@ -312,6 +317,16 @@ async function visualizeSteps(steps, delay) {
     document.getElementById("swaps").textContent = sorter.swaps;
     await new Promise((r) => setTimeout(r, delay));
   }
+}
+
+function getComparingIndices(prevStep, currentStep) {
+  const comparing = [];
+  for (let i = 0; i < prevStep.length; i++) {
+    if (prevStep[i] !== currentStep[i]) {
+      comparing.push(i);
+    }
+  }
+  return comparing;
 }
 
 function stopSorting() {
