@@ -228,6 +228,32 @@
         font-size: 18px;
       }
 
+      .algorithm-info {
+        background: rgba(0, 188, 212, 0.15);
+        border-left: 4px solid #00bcd4;
+        padding: 15px;
+        border-radius: 8px;
+        width: 95%;
+        margin: 10px auto;
+        min-height: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .algorithm-title {
+        font-weight: bold;
+        font-size: 16px;
+        color: #00ff88;
+        margin-bottom: 8px;
+      }
+
+      .algorithm-description {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.8);
+        line-height: 1.4;
+      }
+
       .bar-container {
         display: flex;
         align-items: flex-end;
@@ -313,6 +339,10 @@
         .bar-container {
           height: 300px;
         }
+
+        .algorithm-info {
+          font-size: 13px;
+        }
       }
     </style>
   </head>
@@ -339,7 +369,7 @@
       <h1>Sorting Algorithm Visualizer</h1>
 
       <div class="controls">
-        <select id="algorithm">
+        <select id="algorithm" onchange="updateAlgorithmInfo()">
           <option value="bubble">Bubble Sort</option>
           <option value="selection">Selection Sort</option>
           <option value="insertion">Insertion Sort</option>
@@ -377,6 +407,14 @@
         <button onclick="resetVisualizer()" class="reset-btn">Reset</button>
       </div>
 
+      <div class="algorithm-info">
+        <div class="algorithm-title" id="algoTitle">Bubble Sort</div>
+        <div class="algorithm-description" id="algoDescription">
+          Compares adjacent elements and swaps them if they're in the wrong
+          order. Simple but slow for large datasets.
+        </div>
+      </div>
+
       <div class="stats">
         <span
           class="stat-item"
@@ -405,10 +443,10 @@
     <script src="/static/app.js"></script>
 
     <script>
-      // Show content immediately
       document.getElementById("skeleton").style.display = "none";
       document.getElementById("content").style.display = "block";
       generateArray();
+      updateAlgorithmInfo();
     </script>
   </body>
 </html>

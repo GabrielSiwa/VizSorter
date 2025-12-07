@@ -297,8 +297,56 @@ async function startSorting() {
   stopTimer();
 }
 
+const algorithmDescriptions = {
+  bubble: {
+    title: "Bubble Sort",
+    description:
+      "Comparing adjacent elements and bubbling larger values to the end.",
+    steps: "Swapping adjacent pairs if they're out of order.",
+  },
+  selection: {
+    title: "Selection Sort",
+    description: "Finding the minimum element and placing it at the beginning.",
+    steps: "Looking for the smallest unsorted element.",
+  },
+  insertion: {
+    title: "Insertion Sort",
+    description:
+      "Inserting each element into its correct position in the sorted portion.",
+    steps: "Inserting element into the sorted section.",
+  },
+  merge: {
+    title: "Merge Sort",
+    description:
+      "Dividing the array in half, sorting recursively, then merging sorted halves.",
+    steps: "Merging sorted subarrays together.",
+  },
+  quick: {
+    title: "Quick Sort",
+    description:
+      "Partitioning around a pivot element, then recursively sorting partitions.",
+    steps: "Partitioning elements around the pivot.",
+  },
+  heap: {
+    title: "Heap Sort",
+    description:
+      "Building a max heap and repeatedly extracting the largest element.",
+    steps: "Heapifying to maintain max heap property.",
+  },
+};
+
+function updateAlgorithmInfo() {
+  const algorithm = document.getElementById("algorithm").value;
+  const info = algorithmDescriptions[algorithm];
+
+  document.getElementById("algoTitle").textContent = info.title;
+  document.getElementById("algoDescription").textContent = info.description;
+}
+
 async function visualizeSteps(steps, delay) {
   const soundEnabled = document.getElementById("soundToggle").checked;
+  const algorithm = document.getElementById("algorithm").value;
+  const stepDescription = algorithmDescriptions[algorithm].steps;
 
   for (let i = 0; i < steps.length; i++) {
     if (shouldStop) break;
@@ -307,6 +355,7 @@ async function visualizeSteps(steps, delay) {
     const comparing = sorter.comparingIndices[i] || [];
 
     displayArray(step, comparing);
+    updateStepInfo(i, steps.length, stepDescription);
 
     if (soundEnabled) {
       const max = Math.max(...step);
@@ -318,6 +367,13 @@ async function visualizeSteps(steps, delay) {
     document.getElementById("swaps").textContent = sorter.swaps;
     await new Promise((r) => setTimeout(r, delay));
   }
+}
+
+function updateStepInfo(current, total, description) {
+  const progress = Math.round((current / total) * 100);
+  const algoDescElement = document.getElementById("algoDescription");
+
+  algoDescElement.textContent = `${description} [${progress}% complete]`;
 }
 
 function stopSorting() {
