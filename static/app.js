@@ -439,10 +439,10 @@ document.getElementById("speed").addEventListener("input", (e) => {
   const speed = parseInt(e.target.value);
   let label = "Normal";
 
-  if (speed < 50) label = "🐢 Slow";
-  else if (speed < 150) label = "🚶 Normal";
-  else if (speed < 200) label = "🏃 Fast";
-  else label = "⚡ Very Fast";
+  if (speed < 50) label = "Slow";
+  else if (speed < 150) label = "Normal";
+  else if (speed < 200) label = "Fast";
+  else label = "⚡ Kachoow";
 
   document.getElementById("speedLabel").textContent = label;
 });
