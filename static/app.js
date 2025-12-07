@@ -205,11 +205,13 @@ function generateArray() {
       return;
     }
   } else {
-    const size = document.getElementById("size").value;
-    array = Array.from(
-      { length: size },
-      () => Math.floor(Math.random() * 100) + 1
-    );
+    const sizeEl = document.getElementById("size");
+    const raw = parseInt(sizeEl.value, 10);
+    const min = parseInt(sizeEl.min, 10) || 5;
+    const max = parseInt(sizeEl.max, 10) || 100;
+    const size = Number.isFinite(raw) ? Math.max(min, Math.min(max, raw)) : min;
+    sizeEl.value = size; // reflect clamped value in UI
+    array = Array.from({ length: size }, () => Math.floor(Math.random() * 100) + 1);
   }
   displayArray(array);
   resetStats();
@@ -449,4 +451,37 @@ document.getElementById("speed").addEventListener("input", (e) => {
 
 document.getElementById("soundToggle").addEventListener("change", (e) => {
   audioManager.setEnabled(e.target.checked);
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const sizeEl = document.getElementById("size");
+  if (!sizeEl) return;
+  const min = parseInt(sizeEl.min, 10) || 5;
+  const max = parseInt(sizeEl.max, 10) || 100;
+
+  function validate() {
+    const raw = sizeEl.value.trim();
+    if (raw === "") {
+      sizeEl.classList.remove("invalid");
+      return;
+    }
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n < min || n > max) {
+      sizeEl.classList.add("invalid");
+    } else {
+      sizeEl.classList.remove("invalid");
+    }
+  }
+
+  sizeEl.addEventListener("input", validate);
+
+  sizeEl.addEventListener("blur", function () {
+    let n = parseInt(sizeEl.value, 10);
+    if (!Number.isFinite(n)) n = min;
+    n = Math.max(min, Math.min(max, n));
+    sizeEl.value = n;
+    validate();
+  });
+
+  validate();
 });
