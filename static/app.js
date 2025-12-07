@@ -10,16 +10,19 @@ class SortingAlgorithm {
     this.comparisons = 0;
     this.swaps = 0;
     this.steps = [];
+    this.comparingIndices = [];
   }
 
   reset() {
     this.comparisons = 0;
     this.swaps = 0;
     this.steps = [];
+    this.comparingIndices = [];
   }
 
-  addStep(arr) {
+  addStep(arr, comparingIndices = []) {
     this.steps.push([...arr]);
+    this.comparingIndices.push([...comparingIndices]);
   }
 
   bubbleSort(arr) {
@@ -28,11 +31,11 @@ class SortingAlgorithm {
     for (let i = 0; i < n - 1; i++) {
       for (let j = 0; j < n - i - 1; j++) {
         this.comparisons++;
+        this.addStep(arr, [j, j + 1]);
         if (arr[j] > arr[j + 1]) {
           [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
           this.swaps++;
         }
-        this.addStep(arr);
       }
     }
     return this.steps;
@@ -45,14 +48,14 @@ class SortingAlgorithm {
       let minIdx = i;
       for (let j = i + 1; j < n; j++) {
         this.comparisons++;
+        this.addStep(arr, [i, j]);
         if (arr[j] < arr[minIdx]) {
           minIdx = j;
         }
-        this.addStep(arr);
       }
       [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
       this.swaps++;
-      this.addStep(arr);
+      this.addStep(arr, [i, minIdx]);
     }
     return this.steps;
   }
@@ -64,13 +67,13 @@ class SortingAlgorithm {
       let j = i - 1;
       while (j >= 0 && arr[j] > key) {
         this.comparisons++;
+        this.addStep(arr, [j, i]);
         arr[j + 1] = arr[j];
         j--;
-        this.addStep(arr);
       }
       arr[j + 1] = key;
       this.swaps++;
-      this.addStep(arr);
+      this.addStep(arr, [j + 1]);
     }
     return this.steps;
   }
@@ -105,17 +108,17 @@ class SortingAlgorithm {
         arr[k++] = rightArr[j++];
       }
       this.swaps++;
-      this.addStep(arr);
+      this.addStep(arr, [k - 1]);
     }
 
     while (i < leftArr.length) {
       arr[k++] = leftArr[i++];
-      this.addStep(arr);
+      this.addStep(arr, [k - 1]);
     }
 
     while (j < rightArr.length) {
       arr[k++] = rightArr[j++];
-      this.addStep(arr);
+      this.addStep(arr, [k - 1]);
     }
   }
 
@@ -138,16 +141,16 @@ class SortingAlgorithm {
     let i = low - 1;
     for (let j = low; j < high; j++) {
       this.comparisons++;
+      this.addStep(arr, [j, high]);
       if (arr[j] < pivot) {
         i++;
         [arr[i], arr[j]] = [arr[j], arr[i]];
         this.swaps++;
-        this.addStep(arr);
       }
     }
     [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
     this.swaps++;
-    this.addStep(arr);
+    this.addStep(arr, [i + 1, high]);
     return i + 1;
   }
 
@@ -160,7 +163,7 @@ class SortingAlgorithm {
     for (let i = n - 1; i > 0; i--) {
       [arr[0], arr[i]] = [arr[i], arr[0]];
       this.swaps++;
-      this.addStep(arr);
+      this.addStep(arr, [0, i]);
       this._heapify(arr, i, 0);
     }
     return this.steps;
@@ -180,9 +183,9 @@ class SortingAlgorithm {
       largest = right;
     }
     if (largest !== i) {
+      this.addStep(arr, [i, largest]);
       [arr[i], arr[largest]] = [arr[largest], arr[i]];
       this.swaps++;
-      this.addStep(arr);
       this._heapify(arr, n, largest);
     }
   }
@@ -301,9 +304,7 @@ async function visualizeSteps(steps, delay) {
     if (shouldStop) break;
 
     const step = steps[i];
-
-    // Track which indices are being compared in this step
-    const comparing = i > 0 ? getComparingIndices(steps[i - 1], step) : [];
+    const comparing = sorter.comparingIndices[i] || [];
 
     displayArray(step, comparing);
 
@@ -317,16 +318,6 @@ async function visualizeSteps(steps, delay) {
     document.getElementById("swaps").textContent = sorter.swaps;
     await new Promise((r) => setTimeout(r, delay));
   }
-}
-
-function getComparingIndices(prevStep, currentStep) {
-  const comparing = [];
-  for (let i = 0; i < prevStep.length; i++) {
-    if (prevStep[i] !== currentStep[i]) {
-      comparing.push(i);
-    }
-  }
-  return comparing;
 }
 
 function stopSorting() {
