@@ -382,7 +382,7 @@ document.getElementById("speed").addEventListener("input", (e) => {
 
   if (speed < 50) label = "🐢 Slow";
   else if (speed < 150) label = "🚶 Normal";
-  else if (speed < 300) label = "🏃 Fast";
+  else if (speed < 200) label = "🏃 Fast";
   else label = "⚡ Very Fast";
 
   document.getElementById("speedLabel").textContent = label;
