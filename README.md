@@ -1,105 +1,150 @@
 # VizSorter - Sorting Algorithm Visualizer
 
-A visual learning tool for sorting algorithms with animations and sound.
+A visual learning tool for sorting algorithms with animations and sound effects.
 
-## Current Version (Vercel)
+## Architecture
 
-- **Frontend:** HTML/CSS/JavaScript
-- **Status:** ✅ Live on Vercel
-- **Features:** 6 sorting algorithms, real-time visualization, sound effects
+```text
+Frontend (HTML/CSS/JavaScript - ES Modules)
+         ↓
+   Flask API (Python)
+         ↓
+   Java Backend (Sorting Logic)
+```
 
-## Next Version (Railway - In Progress)
+## Key Features
 
-Frontend (JavaScript)
-↓
-Flask API (Python middleware)
-↓
-Java Backend (Sorting logic)
+- **6 Sorting Algorithms:** Bubble, Selection, Insertion, Merge, Quick, Heap
+- **Real-time Visualization:** Watch sorting step-by-step with smooth animations
+- **Audio Feedback:** Musical notes based on array values
+- **Race Mode:** Run all 6 algorithms simultaneously and compare performance
+- **Custom Input:** Enter your own arrays or generate random ones
+- **Speed Control:** BPM-based tempo control (60-200 BPM)
+- **Statistics:** Live comparison counter and swap counter
+- **Responsive Design:** Mobile and desktop compatible
 
-## Algorithms Included
+## Project Structure
 
-- Bubble Sort
-- Selection Sort
-- Insertion Sort
-- Merge Sort
-- Quick Sort
-- Heap Sort
+```text
+VizSorter/
+├── python/
+│   ├── sort.py                 # Flask app
+│   ├── requirements.txt         # Python dependencies
+│   ├── static/
+│   │   ├── app.js             # Main controller (ES Modules)
+│   │   ├── audioManager.js
+│   │   └── modules/
+│   │       ├── sortingAlgorithms.js
+│   │       ├── visualizer.js
+│   │       ├── raceManager.js
+│   │       ├── constants.js
+│   │       └── javaTest.js
+│   └── templates/
+│       └── index.html          # Main UI
+├── java/
+│   ├── pom.xml                # Maven configuration
+│   └── src/main/java/vizsorter/
+│       └── SortingAPI.java    # Java backend
+├── vercel.json                 # Vercel config (deprecated)
+└── README.md
+```
 
 ## Deployment
 
-- **Current:** Vercel (<https://viz-sorter.vercel.app>)
-- **Future:** Railway (Java + Flask + Frontend)
+**Status:** Ready for Railway deployment
 
-## 🐛 Known Bugs
+### Deploy to Railway
 
-### Critical
+IN DEVELOPMENT
 
-- **Algorithm Switch Bug**: When changing sorting algorithm after starting, visualization freezes but sound continues playing
-  - **Steps to reproduce**:
-    1. Click "Start" with any algorithm
-    2. Change dropdown to different algorithm while sorting
-    3. Bars stop moving but audio persists
-  - **Expected**: Either block dropdown during sort OR restart with new algorithm
+## Local Development
 
-### Minor
+### Prerequisites
 
-- Skeleton loader persists on slow connections
-- Mobile: Speed slider labels overlap on small screens
+- Node.js 16+ (for JavaScript modules)
+- Python 3.8+
+- Java 11+
+- Maven 3.6+
 
----
+### Setup
 
-## 💡 Features in Mind
+1. **Clone and Install Dependencies**
 
-### High Priority
+   ```bash
+   cd python
+   pip install -r requirements.txt
+   cd ../java
+   mvn clean compile
+   ```
 
-- **Side-by-Side Comparison Mode**
-  - Run multiple algorithms simultaneously on same dataset
-  - Visual comparison of performance (comparisons, swaps, time)
-  - Layout: Split screen with 2-4 algorithm visualizations
+2. **Run Flask Server**
 
-### Medium Priority
+   ```bash
+   cd python
+   python sort.py
+   ```
 
-- **Algorithm Complexity Display**
+   Server runs on `http://localhost:5000`
 
-  - Show Big O notation for each algorithm
-  - Real-time comparison: theoretical vs actual performance
-  - Color-coded efficiency indicator
+3. **Run Java Backend** (if needed)
 
-- **Custom Speed Presets**
+   ```bash
+   cd java
+   mvn clean compile
+   mvn exec:java
+   ```
 
-  - Save favorite speed settings
-  - Quick toggle between "Learn Mode" (slow) and "Demo Mode" (fast)
+4. **Access Application**
+   - Open `http://localhost:5000` in browser
 
-- **Export Visualization**
-  - Download sorting animation as GIF/MP4
-  - Share button for social media
+## Code Organization
 
-### Low Priority
+### Frontend (JavaScript ES Modules)
 
-- Dark/Light theme toggle
-- More algorithms (Shell Sort, Radix Sort, Bucket Sort)
-- Step-by-step mode with "Next" button
-- Code snippet viewer (show actual algorithm code)
+- `app.js` - Main controller, event listeners, state management
+- `modules/sortingAlgorithms.js` - Algorithm implementations
+- `modules/visualizer.js` - DOM manipulation and rendering
+- `modules/raceManager.js` - Race mode logic (6 algorithms simultaneously)
+- `modules/constants.js` - Algorithm metadata and descriptions
+- `modules/javaTest.js` - Java backend integration
 
----
+### Backend (Python/Flask)
 
-## 🚀 Roadmap
+- `sort.py` - Flask application, routing, Java integration
 
-**v1.1** (Current - Vercel)
+### Java Backend
 
-- ✅ 6 sorting algorithms
+- `SortingAPI.java` - Sorting implementations
+
+## 🚀 Features
+
+### Current ✅
+
+- ✅ 6 sorting algorithms with visualization
+- ✅ Race mode (all algorithms simultaneously)
 - ✅ Sound effects
-- ✅ Custom input arrays
-- 🔧 Fix algorithm switch bug
+- ✅ Custom array input
+- ✅ Speed control (60-200 BPM)
+- ✅ Live statistics (comparisons, swaps)
+- ✅ Responsive mobile design
+- ✅ Modular JavaScript architecture
 
-**v2.0** (Railway - Java + Flask)
+### Planned 🔄
 
-- Server-side sorting with Java backend
-- Side-by-side comparison mode
-- Performance analytics dashboard
+- Java backend integration for performance
+- Advanced analytics and comparisons
+- More sorting algorithms (Shell, Radix, Bucket)
+- Theme toggle (dark/light mode)
+- Export animations as video
 
-**v3.0** (Future)
+## 🐛 Known Issues
 
-- User accounts & saved visualizations
-- Community-shared datasets
-- Educational mode with explanations
+- None currently reported
+
+## Contributing
+
+Contributions welcome! Please feel free to submit pull requests.
+
+## License
+
+MIT License - Feel free to use this project for learning purposes.
