@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "java -jar target/SortingAPI-*.jar"
+    "startCommand": "mvn clean package && java -jar target/sorting-api-1.0.0.jar"
   }
 }
